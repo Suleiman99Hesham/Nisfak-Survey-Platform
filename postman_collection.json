@@ -1,0 +1,899 @@
+{
+  "info": {
+    "name": "Nisfak Survey Platform",
+    "description": "Postman collection for the Advanced Dynamic Survey Platform API. Requests are ordered so you can run them top-to-bottom — test scripts auto-capture IDs (survey, sections, fields, submission, resume_token) into collection variables.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_postman_id": "nisfak-survey-platform-v1"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      { "key": "token", "value": "{{accessToken}}", "type": "string" }
+    ]
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8000/api/v1" },
+    { "key": "adminUsername", "value": "admin" },
+    { "key": "adminPassword", "value": "admin" },
+    { "key": "accessToken", "value": "" },
+    { "key": "refreshToken", "value": "" },
+    { "key": "surveyId", "value": "" },
+    { "key": "sectionAboutId", "value": "" },
+    { "key": "sectionRoleId", "value": "" },
+    { "key": "sectionRefsId", "value": "" },
+    { "key": "fieldEmpId", "value": "" },
+    { "key": "fieldYearsId", "value": "" },
+    { "key": "fieldDeptId", "value": "" },
+    { "key": "fieldRoleId", "value": "" },
+    { "key": "fieldRefId", "value": "" },
+    { "key": "ruleId", "value": "" },
+    { "key": "dependencyId", "value": "" },
+    { "key": "submissionId", "value": "" },
+    { "key": "resumeToken", "value": "" },
+    { "key": "exportId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login (obtain JWT)",
+          "request": {
+            "method": "POST",
+            "auth": { "type": "noauth" },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{adminUsername}}\",\n  \"password\": \"{{adminPassword}}\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/auth/login/", "host": ["{{baseUrl}}"], "path": ["auth", "login", ""] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.json();",
+                  "if (body.access) pm.collectionVariables.set('accessToken', body.access);",
+                  "if (body.refresh) pm.collectionVariables.set('refreshToken', body.refresh);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Refresh JWT",
+          "request": {
+            "method": "POST",
+            "auth": { "type": "noauth" },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refresh\": \"{{refreshToken}}\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/auth/refresh/", "host": ["{{baseUrl}}"], "path": ["auth", "refresh", ""] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.json();",
+                  "if (body.access) pm.collectionVariables.set('accessToken', body.access);"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "List users",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/users/", "host": ["{{baseUrl}}"], "path": ["users", ""] }
+          }
+        },
+        {
+          "name": "Create user",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"analyst1\",\n  \"email\": \"analyst1@example.com\",\n  \"password\": \"ChangeMe123!\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/users/", "host": ["{{baseUrl}}"], "path": ["users", ""] }
+          }
+        },
+        {
+          "name": "Current user",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/users/me/", "host": ["{{baseUrl}}"], "path": ["users", "me", ""] }
+          }
+        },
+        {
+          "name": "User detail",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/users/:user_id/", "host": ["{{baseUrl}}"], "path": ["users", ":user_id", ""], "variable": [{ "key": "user_id", "value": "" }] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Surveys",
+      "item": [
+        {
+          "name": "List surveys",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/surveys/", "host": ["{{baseUrl}}"], "path": ["surveys", ""] }
+          }
+        },
+        {
+          "name": "Create survey",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Job Application\",\n  \"description\": \"Demo survey for end-to-end walkthrough\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/surveys/", "host": ["{{baseUrl}}"], "path": ["surveys", ""] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.json();",
+                  "if (body.id) pm.collectionVariables.set('surveyId', body.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get survey",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/surveys/{{surveyId}}/", "host": ["{{baseUrl}}"], "path": ["surveys", "{{surveyId}}", ""] }
+          }
+        },
+        {
+          "name": "Update survey",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Job Application (edited)\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/surveys/{{surveyId}}/", "host": ["{{baseUrl}}"], "path": ["surveys", "{{surveyId}}", ""] }
+          }
+        },
+        {
+          "name": "Delete survey (archives)",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{baseUrl}}/surveys/{{surveyId}}/", "host": ["{{baseUrl}}"], "path": ["surveys", "{{surveyId}}", ""] }
+          }
+        },
+        {
+          "name": "Publish survey",
+          "request": {
+            "method": "POST",
+            "url": { "raw": "{{baseUrl}}/surveys/{{surveyId}}/publish/", "host": ["{{baseUrl}}"], "path": ["surveys", "{{surveyId}}", "publish", ""] }
+          }
+        },
+        {
+          "name": "Archive survey",
+          "request": {
+            "method": "POST",
+            "url": { "raw": "{{baseUrl}}/surveys/{{surveyId}}/archive/", "host": ["{{baseUrl}}"], "path": ["surveys", "{{surveyId}}", "archive", ""] }
+          }
+        },
+        {
+          "name": "Duplicate survey",
+          "request": {
+            "method": "POST",
+            "url": { "raw": "{{baseUrl}}/surveys/{{surveyId}}/duplicate/", "host": ["{{baseUrl}}"], "path": ["surveys", "{{surveyId}}", "duplicate", ""] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Sections",
+      "item": [
+        {
+          "name": "List sections",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/surveys/{{surveyId}}/sections/", "host": ["{{baseUrl}}"], "path": ["surveys", "{{surveyId}}", "sections", ""] }
+          }
+        },
+        {
+          "name": "Create section 'About You'",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"About You\",\n  \"description\": \"Basic applicant info\",\n  \"order\": 0\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/surveys/{{surveyId}}/sections/", "host": ["{{baseUrl}}"], "path": ["surveys", "{{surveyId}}", "sections", ""] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.json();",
+                  "if (body.id) pm.collectionVariables.set('sectionAboutId', body.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create section 'Role'",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Role\",\n  \"description\": \"Target role info\",\n  \"order\": 1\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/surveys/{{surveyId}}/sections/", "host": ["{{baseUrl}}"], "path": ["surveys", "{{surveyId}}", "sections", ""] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.json();",
+                  "if (body.id) pm.collectionVariables.set('sectionRoleId', body.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create section 'References'",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"References\",\n  \"description\": \"Shown only if employed and >=3 yrs experience\",\n  \"order\": 2\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/surveys/{{surveyId}}/sections/", "host": ["{{baseUrl}}"], "path": ["surveys", "{{surveyId}}", "sections", ""] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.json();",
+                  "if (body.id) pm.collectionVariables.set('sectionRefsId', body.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Section detail",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/surveys/{{surveyId}}/sections/{{sectionAboutId}}/", "host": ["{{baseUrl}}"], "path": ["surveys", "{{surveyId}}", "sections", "{{sectionAboutId}}", ""] }
+          }
+        },
+        {
+          "name": "Update section",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"title\": \"About You (renamed)\"\n}" },
+            "url": { "raw": "{{baseUrl}}/surveys/{{surveyId}}/sections/{{sectionAboutId}}/", "host": ["{{baseUrl}}"], "path": ["surveys", "{{surveyId}}", "sections", "{{sectionAboutId}}", ""] }
+          }
+        },
+        {
+          "name": "Delete section",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{baseUrl}}/surveys/{{surveyId}}/sections/{{sectionAboutId}}/", "host": ["{{baseUrl}}"], "path": ["surveys", "{{surveyId}}", "sections", "{{sectionAboutId}}", ""] }
+          }
+        },
+        {
+          "name": "Reorder sections",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"order\": [\n    {\"id\": \"{{sectionAboutId}}\", \"order\": 0},\n    {\"id\": \"{{sectionRoleId}}\", \"order\": 1},\n    {\"id\": \"{{sectionRefsId}}\", \"order\": 2}\n  ]\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/surveys/{{surveyId}}/sections/reorder/", "host": ["{{baseUrl}}"], "path": ["surveys", "{{surveyId}}", "sections", "reorder", ""] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Fields",
+      "item": [
+        {
+          "name": "List fields in section",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/sections/{{sectionAboutId}}/fields/", "host": ["{{baseUrl}}"], "path": ["sections", "{{sectionAboutId}}", "fields", ""] }
+          }
+        },
+        {
+          "name": "Create field 'employment_status' (dropdown, inline options)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"key\": \"employment_status\",\n  \"label\": \"Employment status\",\n  \"field_type\": \"dropdown\",\n  \"required\": true,\n  \"order\": 0,\n  \"options\": [\n    {\"label\": \"Employed\",   \"value\": \"employed\",   \"order\": 0},\n    {\"label\": \"Student\",    \"value\": \"student\",    \"order\": 1},\n    {\"label\": \"Unemployed\", \"value\": \"unemployed\", \"order\": 2}\n  ]\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/sections/{{sectionAboutId}}/fields/", "host": ["{{baseUrl}}"], "path": ["sections", "{{sectionAboutId}}", "fields", ""] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.json();",
+                  "if (body.id) pm.collectionVariables.set('fieldEmpId', body.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create field 'years_experience' (number)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"key\": \"years_experience\",\n  \"label\": \"Years of experience\",\n  \"field_type\": \"number\",\n  \"required\": true,\n  \"order\": 1,\n  \"validation_rules\": {\"min_value\": 0, \"max_value\": 50}\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/sections/{{sectionAboutId}}/fields/", "host": ["{{baseUrl}}"], "path": ["sections", "{{sectionAboutId}}", "fields", ""] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.json();",
+                  "if (body.id) pm.collectionVariables.set('fieldYearsId', body.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create field 'department' (dropdown)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"key\": \"department\",\n  \"label\": \"Department\",\n  \"field_type\": \"dropdown\",\n  \"required\": true,\n  \"order\": 0,\n  \"options\": [\n    {\"label\": \"Engineering\", \"value\": \"eng\",   \"order\": 0},\n    {\"label\": \"Sales\",       \"value\": \"sales\", \"order\": 1}\n  ]\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/sections/{{sectionRoleId}}/fields/", "host": ["{{baseUrl}}"], "path": ["sections", "{{sectionRoleId}}", "fields", ""] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.json();",
+                  "if (body.id) pm.collectionVariables.set('fieldDeptId', body.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create field 'role_level' (dropdown)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"key\": \"role_level\",\n  \"label\": \"Role level\",\n  \"field_type\": \"dropdown\",\n  \"required\": false,\n  \"order\": 1,\n  \"options\": [\n    {\"label\": \"Junior Engineer\",  \"value\": \"eng_junior\",  \"order\": 0},\n    {\"label\": \"Senior Engineer\",  \"value\": \"eng_senior\",  \"order\": 1},\n    {\"label\": \"Account Executive\",\"value\": \"sales_ae\",    \"order\": 2},\n    {\"label\": \"Sales Manager\",    \"value\": \"sales_mgr\",   \"order\": 3}\n  ]\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/sections/{{sectionRoleId}}/fields/", "host": ["{{baseUrl}}"], "path": ["sections", "{{sectionRoleId}}", "fields", ""] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.json();",
+                  "if (body.id) pm.collectionVariables.set('fieldRoleId', body.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create field 'reference_name' (text)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"key\": \"reference_name\",\n  \"label\": \"Reference name\",\n  \"field_type\": \"text\",\n  \"required\": true,\n  \"order\": 0\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/sections/{{sectionRefsId}}/fields/", "host": ["{{baseUrl}}"], "path": ["sections", "{{sectionRefsId}}", "fields", ""] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.json();",
+                  "if (body.id) pm.collectionVariables.set('fieldRefId', body.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Field detail",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/sections/{{sectionAboutId}}/fields/{{fieldEmpId}}/", "host": ["{{baseUrl}}"], "path": ["sections", "{{sectionAboutId}}", "fields", "{{fieldEmpId}}", ""] }
+          }
+        },
+        {
+          "name": "Update field",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"label\": \"Employment status (updated)\"\n}" },
+            "url": { "raw": "{{baseUrl}}/sections/{{sectionAboutId}}/fields/{{fieldEmpId}}/", "host": ["{{baseUrl}}"], "path": ["sections", "{{sectionAboutId}}", "fields", "{{fieldEmpId}}", ""] }
+          }
+        },
+        {
+          "name": "Delete field",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{baseUrl}}/sections/{{sectionAboutId}}/fields/{{fieldEmpId}}/", "host": ["{{baseUrl}}"], "path": ["sections", "{{sectionAboutId}}", "fields", "{{fieldEmpId}}", ""] }
+          }
+        },
+        {
+          "name": "Reorder fields",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"order\": [\n    {\"id\": \"{{fieldEmpId}}\",   \"order\": 0},\n    {\"id\": \"{{fieldYearsId}}\", \"order\": 1}\n  ]\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/sections/{{sectionAboutId}}/fields/reorder/", "host": ["{{baseUrl}}"], "path": ["sections", "{{sectionAboutId}}", "fields", "reorder", ""] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Field Options",
+      "item": [
+        {
+          "name": "List options",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/fields/{{fieldEmpId}}/options/", "host": ["{{baseUrl}}"], "path": ["fields", "{{fieldEmpId}}", "options", ""] }
+          }
+        },
+        {
+          "name": "Create option",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"label\": \"Contractor\",\n  \"value\": \"contractor\",\n  \"order\": 3\n}" },
+            "url": { "raw": "{{baseUrl}}/fields/{{fieldEmpId}}/options/", "host": ["{{baseUrl}}"], "path": ["fields", "{{fieldEmpId}}", "options", ""] }
+          }
+        },
+        {
+          "name": "Update option",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"label\": \"Contractor (renamed)\"\n}" },
+            "url": { "raw": "{{baseUrl}}/fields/{{fieldEmpId}}/options/:option_id/", "host": ["{{baseUrl}}"], "path": ["fields", "{{fieldEmpId}}", "options", ":option_id", ""], "variable": [{ "key": "option_id", "value": "" }] }
+          }
+        },
+        {
+          "name": "Delete option",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{baseUrl}}/fields/{{fieldEmpId}}/options/:option_id/", "host": ["{{baseUrl}}"], "path": ["fields", "{{fieldEmpId}}", "options", ":option_id", ""], "variable": [{ "key": "option_id", "value": "" }] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Visibility Rules",
+      "item": [
+        {
+          "name": "List rules",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/surveys/{{surveyId}}/rules/", "host": ["{{baseUrl}}"], "path": ["surveys", "{{surveyId}}", "rules", ""] }
+          }
+        },
+        {
+          "name": "Create rule (AND: employed AND years >= 3 shows References section)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"target_type\": \"section\",\n  \"target_id\": \"{{sectionRefsId}}\",\n  \"logical_operator\": \"AND\",\n  \"conditions\": [\n    {\"source_field\": \"{{fieldEmpId}}\",   \"operator\": \"eq\",  \"expected_value\": \"employed\"},\n    {\"source_field\": \"{{fieldYearsId}}\", \"operator\": \"gte\", \"expected_value\": 3}\n  ]\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/surveys/{{surveyId}}/rules/", "host": ["{{baseUrl}}"], "path": ["surveys", "{{surveyId}}", "rules", ""] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.json();",
+                  "if (body.id) pm.collectionVariables.set('ruleId', body.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Rule detail",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/surveys/{{surveyId}}/rules/{{ruleId}}/", "host": ["{{baseUrl}}"], "path": ["surveys", "{{surveyId}}", "rules", "{{ruleId}}", ""] }
+          }
+        },
+        {
+          "name": "Update rule (switch to OR)",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"logical_operator\": \"OR\"\n}" },
+            "url": { "raw": "{{baseUrl}}/surveys/{{surveyId}}/rules/{{ruleId}}/", "host": ["{{baseUrl}}"], "path": ["surveys", "{{surveyId}}", "rules", "{{ruleId}}", ""] }
+          }
+        },
+        {
+          "name": "Delete rule",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{baseUrl}}/surveys/{{surveyId}}/rules/{{ruleId}}/", "host": ["{{baseUrl}}"], "path": ["surveys", "{{surveyId}}", "rules", "{{ruleId}}", ""] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Field Dependencies",
+      "item": [
+        {
+          "name": "List dependencies",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/surveys/{{surveyId}}/dependencies/", "host": ["{{baseUrl}}"], "path": ["surveys", "{{surveyId}}", "dependencies", ""] }
+          }
+        },
+        {
+          "name": "Create dependency: options_filter (department -> role_level)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"source_field\": \"{{fieldDeptId}}\",\n  \"target_field\": \"{{fieldRoleId}}\",\n  \"dependency_type\": \"options_filter\",\n  \"config\": {\n    \"mapping\": {\n      \"eng\":   [\"eng_junior\", \"eng_senior\"],\n      \"sales\": [\"sales_ae\", \"sales_mgr\"]\n    },\n    \"default\": []\n  }\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/surveys/{{surveyId}}/dependencies/", "host": ["{{baseUrl}}"], "path": ["surveys", "{{surveyId}}", "dependencies", ""] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.json();",
+                  "if (body.id) pm.collectionVariables.set('dependencyId', body.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create dependency: required_if (employed -> role_level required)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"source_field\": \"{{fieldEmpId}}\",\n  \"target_field\": \"{{fieldRoleId}}\",\n  \"dependency_type\": \"required_if\",\n  \"config\": {\"condition\": {\"operator\": \"eq\", \"value\": \"employed\"}}\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/surveys/{{surveyId}}/dependencies/", "host": ["{{baseUrl}}"], "path": ["surveys", "{{surveyId}}", "dependencies", ""] }
+          }
+        },
+        {
+          "name": "Create dependency: visibility (example)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"source_field\": \"{{fieldEmpId}}\",\n  \"target_field\": \"{{fieldRoleId}}\",\n  \"dependency_type\": \"visibility\",\n  \"config\": {\"condition\": {\"operator\": \"eq\", \"value\": \"employed\"}}\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/surveys/{{surveyId}}/dependencies/", "host": ["{{baseUrl}}"], "path": ["surveys", "{{surveyId}}", "dependencies", ""] }
+          }
+        },
+        {
+          "name": "Dependency detail",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/surveys/{{surveyId}}/dependencies/{{dependencyId}}/", "host": ["{{baseUrl}}"], "path": ["surveys", "{{surveyId}}", "dependencies", "{{dependencyId}}", ""] }
+          }
+        },
+        {
+          "name": "Update dependency",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"config\": {\"mapping\": {\"eng\": [\"eng_senior\"], \"sales\": [\"sales_mgr\"]}, \"default\": []}\n}" },
+            "url": { "raw": "{{baseUrl}}/surveys/{{surveyId}}/dependencies/{{dependencyId}}/", "host": ["{{baseUrl}}"], "path": ["surveys", "{{surveyId}}", "dependencies", "{{dependencyId}}", ""] }
+          }
+        },
+        {
+          "name": "Delete dependency",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{baseUrl}}/surveys/{{surveyId}}/dependencies/{{dependencyId}}/", "host": ["{{baseUrl}}"], "path": ["surveys", "{{surveyId}}", "dependencies", "{{dependencyId}}", ""] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Respondent (Public)",
+      "item": [
+        {
+          "name": "Get published survey",
+          "request": {
+            "method": "GET",
+            "auth": { "type": "noauth" },
+            "url": { "raw": "{{baseUrl}}/public/surveys/{{surveyId}}/", "host": ["{{baseUrl}}"], "path": ["public", "surveys", "{{surveyId}}", ""] }
+          }
+        },
+        {
+          "name": "Start submission",
+          "request": {
+            "method": "POST",
+            "auth": { "type": "noauth" },
+            "url": { "raw": "{{baseUrl}}/public/surveys/{{surveyId}}/start/", "host": ["{{baseUrl}}"], "path": ["public", "surveys", "{{surveyId}}", "start", ""] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.json();",
+                  "if (body.id) pm.collectionVariables.set('submissionId', body.id);",
+                  "if (body.resume_token) pm.collectionVariables.set('resumeToken', body.resume_token);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Save answers (Case A: employed, 5 yrs, eng/senior, reference)",
+          "request": {
+            "method": "POST",
+            "auth": { "type": "noauth" },
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "X-Resume-Token", "value": "{{resumeToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "[\n  {\"field_id\": \"{{fieldEmpId}}\",   \"value\": \"employed\"},\n  {\"field_id\": \"{{fieldYearsId}}\", \"value\": 5},\n  {\"field_id\": \"{{fieldDeptId}}\",  \"value\": \"eng\"},\n  {\"field_id\": \"{{fieldRoleId}}\",  \"value\": \"eng_senior\"},\n  {\"field_id\": \"{{fieldRefId}}\",   \"value\": \"Jane Doe\"}\n]"
+            },
+            "url": { "raw": "{{baseUrl}}/public/responses/{{submissionId}}/answers/", "host": ["{{baseUrl}}"], "path": ["public", "responses", "{{submissionId}}", "answers", ""] }
+          }
+        },
+        {
+          "name": "Save draft (explicit)",
+          "request": {
+            "method": "POST",
+            "auth": { "type": "noauth" },
+            "header": [{ "key": "X-Resume-Token", "value": "{{resumeToken}}" }],
+            "url": { "raw": "{{baseUrl}}/public/responses/{{submissionId}}/save-draft/", "host": ["{{baseUrl}}"], "path": ["public", "responses", "{{submissionId}}", "save-draft", ""] }
+          }
+        },
+        {
+          "name": "Current submission state",
+          "request": {
+            "method": "GET",
+            "auth": { "type": "noauth" },
+            "header": [{ "key": "X-Resume-Token", "value": "{{resumeToken}}" }],
+            "url": { "raw": "{{baseUrl}}/public/responses/{{submissionId}}/current/", "host": ["{{baseUrl}}"], "path": ["public", "responses", "{{submissionId}}", "current", ""] }
+          }
+        },
+        {
+          "name": "Submit response",
+          "request": {
+            "method": "POST",
+            "auth": { "type": "noauth" },
+            "header": [{ "key": "X-Resume-Token", "value": "{{resumeToken}}" }],
+            "url": { "raw": "{{baseUrl}}/public/responses/{{submissionId}}/submit/", "host": ["{{baseUrl}}"], "path": ["public", "responses", "{{submissionId}}", "submit", ""] }
+          }
+        },
+        {
+          "name": "Resume by token",
+          "request": {
+            "method": "GET",
+            "auth": { "type": "noauth" },
+            "url": { "raw": "{{baseUrl}}/public/responses/resume/{{resumeToken}}/", "host": ["{{baseUrl}}"], "path": ["public", "responses", "resume", "{{resumeToken}}", ""] }
+          }
+        },
+        {
+          "name": "Save answers (Case B: invalid option — sales_mgr under eng)",
+          "request": {
+            "method": "POST",
+            "auth": { "type": "noauth" },
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "X-Resume-Token", "value": "{{resumeToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "[\n  {\"field_id\": \"{{fieldEmpId}}\",   \"value\": \"student\"},\n  {\"field_id\": \"{{fieldYearsId}}\", \"value\": 1},\n  {\"field_id\": \"{{fieldDeptId}}\",  \"value\": \"eng\"},\n  {\"field_id\": \"{{fieldRoleId}}\",  \"value\": \"sales_mgr\"}\n]"
+            },
+            "url": { "raw": "{{baseUrl}}/public/responses/{{submissionId}}/answers/", "host": ["{{baseUrl}}"], "path": ["public", "responses", "{{submissionId}}", "answers", ""] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Submissions (Admin/Analyst)",
+      "item": [
+        {
+          "name": "List submissions for survey",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/surveys/{{surveyId}}/submissions/", "host": ["{{baseUrl}}"], "path": ["surveys", "{{surveyId}}", "submissions", ""] }
+          }
+        },
+        {
+          "name": "Submission detail",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/submissions/{{submissionId}}/", "host": ["{{baseUrl}}"], "path": ["submissions", "{{submissionId}}", ""] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Analytics",
+      "item": [
+        {
+          "name": "Survey analytics summary",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/surveys/{{surveyId}}/analytics/summary/", "host": ["{{baseUrl}}"], "path": ["surveys", "{{surveyId}}", "analytics", "summary", ""] }
+          }
+        },
+        {
+          "name": "Field analytics (per-field breakdown)",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/surveys/{{surveyId}}/analytics/fields/{{fieldEmpId}}/", "host": ["{{baseUrl}}"], "path": ["surveys", "{{surveyId}}", "analytics", "fields", "{{fieldEmpId}}", ""] }
+          }
+        },
+        {
+          "name": "Request export (CSV)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"export_format\": \"csv\",\n  \"filters\": {}\n}" },
+            "url": { "raw": "{{baseUrl}}/surveys/{{surveyId}}/exports/", "host": ["{{baseUrl}}"], "path": ["surveys", "{{surveyId}}", "exports", ""] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const body = pm.response.json();",
+                  "if (body.id) pm.collectionVariables.set('exportId', body.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Export status / download",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/exports/{{exportId}}/", "host": ["{{baseUrl}}"], "path": ["exports", "{{exportId}}", ""] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Invitations",
+      "item": [
+        {
+          "name": "Send invitations (bulk, async)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"emails\": [\n    \"a@example.com\",\n    \"b@example.com\",\n    \"c@example.com\"\n  ]\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/surveys/{{surveyId}}/invitations/", "host": ["{{baseUrl}}"], "path": ["surveys", "{{surveyId}}", "invitations", ""] }
+          }
+        },
+        {
+          "name": "List invitations for survey",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/surveys/{{surveyId}}/invitations/list/", "host": ["{{baseUrl}}"], "path": ["surveys", "{{surveyId}}", "invitations", "list", ""] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Audit Logs",
+      "item": [
+        {
+          "name": "List audit logs",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/audit-logs/?action=&entity_type=&entity_id=&actor=",
+              "host": ["{{baseUrl}}"],
+              "path": ["audit-logs", ""],
+              "query": [
+                { "key": "action", "value": "", "description": "e.g. survey.publish" },
+                { "key": "entity_type", "value": "", "description": "e.g. Survey" },
+                { "key": "entity_id", "value": "" },
+                { "key": "actor", "value": "" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Audit log detail",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/audit-logs/:log_id/", "host": ["{{baseUrl}}"], "path": ["audit-logs", ":log_id", ""], "variable": [{ "key": "log_id", "value": "" }] }
+          }
+        }
+      ]
+    }
+  ]
+}
